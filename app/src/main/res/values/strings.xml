@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Cat Agent Profile</string>
+    <string name="random_picture">a random picture of a cat</string>
 </resources>

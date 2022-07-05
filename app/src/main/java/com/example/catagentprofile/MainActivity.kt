@@ -3,9 +3,12 @@ package com.example.catagentprofile
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.ImageView
 import android.widget.TextView
 import com.example.catagentprofile.api.TheCatApiService
 import com.example.catagentprofile.data.ImageResultData
+import com.example.catagentprofile.imageloader.GlideImageLoader
+import com.example.catagentprofile.imageloader.ImageLoader
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,6 +34,17 @@ class MainActivity : AppCompatActivity() {
         findViewById(R.id.main_server_response)
     }
 
+    private  val imageLoader: ImageLoader by lazy {
+        GlideImageLoader(this)
+    }
+
+    private val profileImageView:ImageView by lazy {
+        findViewById(R.id.imageView)
+    }
+    private val agentBreedView : TextView by lazy {
+        findViewById(R.id.agent_breed_value)
+    }
+
     private fun getCatImageResponse(){
         val call = theCatApiService.searchImages(1,"full")
         call.enqueue(object :Callback<List<ImageResultData>>{
@@ -42,9 +56,14 @@ class MainActivity : AppCompatActivity() {
                  if (response.isSuccessful){
                      val imageResult = response.body()
                      val firstImageUrl = imageResult?.firstOrNull()?.imageUrl ?:"No Url"
+                     if(!firstImageUrl.isBlank()){
+                         imageLoader.loadImage(firstImageUrl,profileImageView)
+                     }
                      serverResponseView.text = buildString {
         append("Image URL:")
         append(firstImageUrl)
+                         agentBreedView.text = buildString { append(imageResult?.firstOrNull()?.breeds?.firstOrNull()?.name?:"Unknown")
+                         }
     }
                  } else {
                      Log.e("MainActivity", "Failed to get search results\n${response.errorBody()?.string()?:""} ", )
